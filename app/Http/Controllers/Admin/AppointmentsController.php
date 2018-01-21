@@ -43,7 +43,15 @@ class AppointmentsController extends Controller
         if ($validator->fails()) {
             return $response->getValidationError($validator->messages());
         }
-        $patient = new Patients();
+        $patientId = $request->input('patientId');
+        if($patientId) {
+            $patient = Patients::find($patientId);
+            if(!$patient) {
+                return $response->getNotFound('Patient Not Found');
+            }
+        } else {
+            $patient = new Patients();
+        }
         $patient->name = $request->input('name');
         $patient->email = $request->input('email');
         $patient->mobile = $request->input('mobile');
