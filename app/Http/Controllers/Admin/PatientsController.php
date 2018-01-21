@@ -18,6 +18,12 @@ class PatientsController extends Controller
         $data = Patients::with('medicalHistory')->get();
         return $response->getSuccessResponse('Success!', $data);
     }
+    public function search($q)
+    {
+        $response = new Response();
+        $data = Patients::search($q)->get();
+        return $response->getSuccessResponse('Success!', $data);
+    }
     public function getPatientById($id) {
         $response = new Response();
         $data = Patients::with('medicalHistory')->find($id);

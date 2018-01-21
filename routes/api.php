@@ -23,6 +23,7 @@ Route::group(['prefix' => 'users'], function () {
 Route::group(['prefix' => 'admin', 'middleware' => ['ability:admin']], function () {
     Route::group(['prefix' => 'patients'], function () {
         Route::get('all', 'Admin\PatientsController@index');
+        Route::get('search/{q}', 'Admin\PatientsController@search');
         Route::get('get/{id}', 'Admin\PatientsController@getPatientById');
         Route::post('create', 'Admin\PatientsController@store');
         Route::post('edit', 'Admin\PatientsController@edit');
