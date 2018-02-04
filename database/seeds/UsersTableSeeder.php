@@ -22,6 +22,14 @@ class UsersTableSeeder extends Seeder
         );
 
         // Loop through each user above and create the record for them in the database
+        $user = new User();
+        $user->name = "admin";
+        $user->email = "admin@curely.com";
+        $user->mobile = "9560401880";
+        $user->password = Hash::make('password');
+        $user->save();
+        $user->roles()->attach(1);
+
         foreach ($users as $user)
         {
             User::create($user);
