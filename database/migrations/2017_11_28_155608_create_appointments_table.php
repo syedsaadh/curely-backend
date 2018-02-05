@@ -64,7 +64,7 @@ class CreateAppointmentsTable extends Migration
             $table->text('complaints')->nullable();
             $table->text('notes')->nullable();
             $table->text('observations')->nullable();
-            $table->text('diagnoses')->nullable();
+            $table->text('diagnosis')->nullable();
             $table->timestamps();
 
             $table->foreign('appointment_id')->references('id')->on('appointments')
@@ -98,6 +98,13 @@ class CreateAppointmentsTable extends Migration
             $table->foreign('appointment_id')->references('id')->on('appointments')
                 ->onUpdate('cascade')->onDelete('cascade');
         });
+        Schema::create('appointment_vital_signs', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('appointment_id')->unsigned();
+            $table->timestamps();
+            $table->foreign('appointment_id')->references('id')->on('appointments')
+                ->onUpdate('cascade')->onDelete('cascade');
+        });
     }
 
     /**
@@ -107,6 +114,7 @@ class CreateAppointmentsTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('appointment_vital_signs');
         Schema::dropIfExists('appointment_completed_procedures');
         Schema::dropIfExists('appointment_treatment_plans');
         Schema::dropIfExists('appointment_clinical_notes');
