@@ -20,10 +20,10 @@ class VitalSignsSeeder extends Seeder
         foreach ($signs as $sign)
         {
             VitalSigns::create($sign);
-            $name = $sign['column_name'];
-            Schema::table('appointment_vital_signs', function ($table) use ($name) {
-                $table->string($name)->nullable();
-            });
+            //$name = $sign['column_name'];
+            //Schema::table('appointment_vital_signs', function ($table) use ($name) {
+              //  $table->string($name)->nullable();
+            //});
         }
     }
 }
