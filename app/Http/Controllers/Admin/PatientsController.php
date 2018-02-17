@@ -21,12 +21,13 @@ class PatientsController extends Controller
     public function search($q)
     {
         $response = new Response();
-        $data = Patients::search($q)->get();
+        //$data = Patients::search($q)->get();  Algolia Search
+        $data = Patients::where('name', 'like', '%'.$q.'%')->get();
         return $response->getSuccessResponse('Success!', $data);
     }
     public function getPatientById($id) {
         $response = new Response();
-        $data = Patients::with('medicalHistory')->find($id);
+        $data = Patients::with(['medicalHistory', 'appointments'])->find($id);
         if(!$data) {
             return $response->getNotFound();
         }

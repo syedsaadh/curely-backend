@@ -62,12 +62,23 @@ Route::group(['prefix' => 'admin', 'middleware' => ['ability:admin']], function 
         Route::get('all', 'Admin\RolesController@index');
         Route::post('create', 'Admin\RolesController@createRole');
     });
-    Route::group(['prefix' => 'appointments'], function () {
+    Route::group(['prefix' => 'appointment'], function () {
         Route::get('all', 'Admin\AppointmentsController@index');
+        Route::get('get', 'Admin\AppointmentsController@get');
+        Route::get('get/{id}', 'Admin\AppointmentsController@getById');
         Route::post('create', 'Admin\AppointmentsController@store');
         Route::post('edit', 'Admin\AppointmentsController@edit');
-        Route::post('cancel', 'Admin\AppointmentsController@cancel');
+        Route::post('cancel', 'Admin\AppointmentsController@cancelAppointment');
+        Route::post('vitalsigns/update', 'Admin\AppointmentsVitalSignsController@store');
+        Route::get('vitalsigns/delete/{appointmentId}', 'Admin\AppointmentsVitalSignsController@delete');
+        Route::post('clinicalnotes/update', 'Admin\AppointmentsClinicalNotesController@store');
+        Route::get('clinicalnotes/delete/{appointmentId}', 'Admin\AppointmentsClinicalNotesController@delete');
+        Route::post('treatments/update', 'Admin\AppointmentsCompletedProceduresController@store');
+    });
+    Route::group(['prefix' => 'vitalsigns'], function () {
+        Route::get('all', 'Admin\VitalSignsController@index');
+        Route::post('create', 'Admin\VitalSignsController@store');
+        Route::post('edit', 'Admin\VitalSignsController@edit');
+        Route::get('delete/{id}', 'Admin\VitalSignsController@delete');
     });
 });
-
-Route::get('labs', 'Admin\LabTestsController@index');

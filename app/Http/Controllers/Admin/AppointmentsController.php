@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
+
 class AppointmentsController extends Controller
 {
     public function index()
@@ -20,6 +21,7 @@ class AppointmentsController extends Controller
         $data = Appointments::with('patient')->get();
         return $response->getSuccessResponse('Success!', $data);
     }
+
     public function get(Request $request)
     {
         $response = new Response();
@@ -40,14 +42,25 @@ class AppointmentsController extends Controller
         return $response->getSuccessResponse("Success!", $data);
 
     }
-    public function store(Request $request) {
+
+    public function getById($id)
+    {
+        $response = new Response();
+        $data = Appointments::with(['vitalSigns.fields', 'clinicalNotes',
+            'labOrders', 'prescriptions', 'completedProcedures', 'treatmentPlans'])->find($id);
+        if (!$data) return $response->getNotFound();
+        return $response->getSuccessResponse('Success!', $data);
+    }
+
+    public function store(Request $request)
+    {
         $response = new Response();
 
         $validator = Validator::make($request->all(), [
             'patientId' => 'present',
             'name' => 'required',
-            'mobile'=> 'present',
-            'email'=> 'present',
+            'mobile' => 'present',
+            'email' => 'present',
             'gender' => 'present',
             'dob' => 'present',
             'age' => 'present',
@@ -63,9 +76,9 @@ class AppointmentsController extends Controller
             return $response->getValidationError($validator->messages());
         }
         $patientId = $request->input('patientId');
-        if($patientId) {
+        if ($patientId) {
             $patient = Patients::find($patientId);
-            if(!$patient) {
+            if (!$patient) {
                 return $response->getNotFound('Patient Not Found');
             }
         } else {
@@ -92,10 +105,10 @@ class AppointmentsController extends Controller
         $doctor = User::find($doctorId);
         $department = Departments::find($departmentId)->first();
 
-        if($doctorId && !$doctor) {
+        if ($doctorId && !$doctor) {
             return $response->getNotFound('Doctor Not Found');
         }
-        if($departmentId && !$department) {
+        if ($departmentId && !$department) {
             return $response->getNotFound('Department Not Found');
         }
         $appointment = new Appointments();
@@ -106,7 +119,7 @@ class AppointmentsController extends Controller
         $appointment->for_doctor = $doctor ? $doctor->id : null;
         $appointment->notes = $notes;
         $appointment->cancelled = false;
-        if(Appointments::where([
+        if (Appointments::where([
             ['scheduled_from', '<', $scheduledTo],
             ['scheduled_from', '>', $scheduledFrom],
         ])
@@ -122,7 +135,8 @@ class AppointmentsController extends Controller
                 ['scheduled_from', '<', $scheduledFrom],
                 ['scheduled_to', '>', $scheduledFrom],
             ])
-            ->first()) {
+            ->first()
+        ) {
             return $response->getAlreadyPresent('Schedule is Already Taken!');
         }
         try {
@@ -132,7 +146,9 @@ class AppointmentsController extends Controller
         }
         return $response->getSuccessResponse('Created Appointment Successfully!', ['id' => $appointment->id]);
     }
-    public function edit(Request $request) {
+
+    public function edit(Request $request)
+    {
         $response = new Response();
 
         $validator = Validator::make($request->all(), [
@@ -146,9 +162,9 @@ class AppointmentsController extends Controller
         if ($validator->fails()) {
             return $response->getValidationError($validator->messages());
         }
-        $appointment = Appointments::find( $request->input('id'));
+        $appointment = Appointments::find($request->input('id'));
 
-        if(!$appointment) {
+        if (!$appointment) {
             return $response->getNotFound('Appointment Not Found');
         }
         $scheduledFrom = $request->input('scheduledFrom');
@@ -160,32 +176,32 @@ class AppointmentsController extends Controller
         $doctor = User::find($doctorId);
         $department = Departments::find($departmentId);
 
-        if($doctorId && !$doctor) {
+        if ($doctorId && !$doctor) {
             return $response->getNotFound('Doctor Not Found');
         }
-        if($departmentId && !$department) {
+        if ($departmentId && !$department) {
             return $response->getNotFound('Department Not Found');
         }
-            $searchAppointment = Appointments::where([
-                ['scheduled_from', '<', $scheduledTo],
-                ['scheduled_from', '>', $scheduledFrom],
+        $searchAppointment = Appointments::where([
+            ['scheduled_from', '<', $scheduledTo],
+            ['scheduled_from', '>', $scheduledFrom],
+        ])
+            ->orWhere([
+                ['scheduled_from', '<=', $scheduledFrom],
+                ['scheduled_to', '>=', $scheduledTo]
             ])
-                ->orWhere([
-                    ['scheduled_from', '=', $scheduledFrom],
-                    ['scheduled_to', '=', $scheduledTo]
-                ])
-                ->orWhere([
-                    ['scheduled_to', '<', $scheduledTo],
-                    ['scheduled_to', '>', $scheduledFrom],
-                ])
-                ->orWhere([
-                    ['scheduled_from', '<', $scheduledFrom],
-                    ['scheduled_to', '>', $scheduledFrom],
-                ])
-                ->first();
-            if($searchAppointment && $searchAppointment->id != $appointment->id) {
-                return $response->getAlreadyPresent('Schedule is Already Taken!');
-            }
+            ->orWhere([
+                ['scheduled_to', '<', $scheduledTo],
+                ['scheduled_to', '>', $scheduledFrom],
+            ])
+            ->orWhere([
+                ['scheduled_from', '<', $scheduledFrom],
+                ['scheduled_to', '>', $scheduledFrom],
+            ])
+            ->first();
+        if ($searchAppointment && $searchAppointment->id != $appointment->id) {
+            return $response->getAlreadyPresent('Schedule is Already Taken!');
+        }
 
         $appointment->scheduled_from = $scheduledFrom;
         $appointment->scheduled_to = $scheduledTo;
@@ -201,7 +217,9 @@ class AppointmentsController extends Controller
         }
         return $response->getSuccessResponse('Edited Appointment Successfully!');
     }
-    public function cancelAppointment(Request $request) {
+
+    public function cancelAppointment(Request $request)
+    {
         $response = new Response();
         $validator = Validator::make($request->all(), [
             'id' => 'required',
@@ -211,11 +229,11 @@ class AppointmentsController extends Controller
         if ($validator->fails()) {
             return $response->getValidationError($validator->messages());
         }
-        $appointment = Appointments::find( $request->input('id'));
+        $appointment = Appointments::find($request->input('id'));
         $deletePermanent = $request->input('delete');
         $reason = $request->input('reason');
 
-        if(!$appointment) {
+        if (!$appointment) {
             return $response->getNotFound('Appointment Not Found');
         }
         try {
@@ -226,8 +244,7 @@ class AppointmentsController extends Controller
             } else {
                 $appointment->delete();
             }
-        }
-        catch (QueryException $e) {
+        } catch (QueryException $e) {
             return $response->getUnknownError('Error Cancelling Appointment!');
         }
         return $response->getSuccessResponse();
