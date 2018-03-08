@@ -24,7 +24,7 @@ class AppointmentsCompletedProceduresController extends Controller
             'procedures.*.units' => 'present|numeric|min:1',
             'procedures.*.cost' => 'present|numeric|min:0',
             'procedures.*.discount' => 'present|numeric|min:0',
-            'procedures.*.notes' => 'present|string',
+            'procedures.*.notes' => 'present|string|nullable',
             'procedures.*.id' => 'numeric|nullable',
             'procedures.*.delete' => 'required|boolean',
         ]);
@@ -41,7 +41,7 @@ class AppointmentsCompletedProceduresController extends Controller
             return $el['delete'] == true && array_key_exists('id', $el);
         });
         $toInsert = array_filter($procedures, function ($el) {
-            return $el['delete'] == false && !array_key_exists('id', $el);
+            return $el['delete'] == false && $el['id'] === null;
         });
         $toUpdate = array_filter($procedures, function ($el) {
             return $el['delete'] == false && array_key_exists('id', $el);
@@ -84,5 +84,18 @@ class AppointmentsCompletedProceduresController extends Controller
             }
         }
         return $response->getSuccessResponse('Success!');
+    }
+    public function delete($appointmentId) {
+        $response = new Response();
+        $cp = AppointmentCompletedProcedures::where('appointment_id', '=', $appointmentId);
+        if (!$cp) {
+            return $response->getNotFound('Not Found');
+        }
+        try {
+            $cp->delete();
+        } catch (QueryException $e) {
+            return $response->getUnknownError($e);
+        }
+        return $response->getSuccessResponse();
     }
 }
