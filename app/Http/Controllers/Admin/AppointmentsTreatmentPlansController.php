@@ -41,7 +41,7 @@ class AppointmentsTreatmentPlansController extends Controller
             return $el['delete'] == true && array_key_exists('id', $el);
         });
         $toInsert = array_filter($procedures, function ($el) {
-            return $el['delete'] == false && !array_key_exists('id', $el);
+            return $el['delete'] == false && $el['id'] === null;
         });
         $toUpdate = array_filter($procedures, function ($el) {
             return $el['delete'] == false && array_key_exists('id', $el);
@@ -84,5 +84,18 @@ class AppointmentsTreatmentPlansController extends Controller
             }
         }
         return $response->getSuccessResponse('Success!');
+    }
+    public function delete($appointmentId) {
+        $response = new Response();
+        $tp = AppointmentTreatmentPlans::where('appointment_id', '=', $appointmentId);
+        if (!$tp) {
+            return $response->getNotFound('Not Found');
+        }
+        try {
+            $tp->delete();
+        } catch (QueryException $e) {
+            return $response->getUnknownError($e);
+        }
+        return $response->getSuccessResponse();
     }
 }
