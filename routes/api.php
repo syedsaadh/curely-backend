@@ -54,7 +54,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['ability:admin']], function 
     });
     Route::group(['prefix' => 'procedures'], function () {
         Route::get('all', 'Admin\ProceduresController@index');
-        Route::get('search/{q}', 'Admin\ProcedureController@search');
+        Route::get('search/{q}', 'Admin\ProceduresController@search');
         Route::post('create', 'Admin\ProceduresController@store');
         Route::post('edit', 'Admin\ProceduresController@edit');
         Route::get('delete/{id}', 'Admin\ProceduresController@delete');
@@ -75,7 +75,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['ability:admin']], function 
         Route::post('clinicalnotes/update', 'Admin\AppointmentsClinicalNotesController@store');
         Route::get('clinicalnotes/delete/{appointmentId}', 'Admin\AppointmentsClinicalNotesController@delete');
         Route::post('completedprocedures/update', 'Admin\AppointmentsCompletedProceduresController@store');
+        Route::get('completedprocedures/delete/{appointmentId}', 'Admin\AppointmentsCompletedProceduresController@delete');
         Route::post('treatmentplans/update', 'Admin\AppointmentsTreatmentPlansController@store');
+        Route::get('treatmentplans/delete/{appointmentId}', 'Admin\AppointmentsTreatmentPlansController@delete');
     });
     Route::group(['prefix' => 'vitalsigns'], function () {
         Route::get('all', 'Admin\VitalSignsController@index');
