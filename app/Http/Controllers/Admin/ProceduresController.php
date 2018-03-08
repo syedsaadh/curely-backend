@@ -16,6 +16,14 @@ class ProceduresController extends Controller
         $data = Procedures::all();
         return $response->getSuccessResponse('Success!', $data);
     }
+
+    public function search($q)
+    {
+        $response = new Response();
+        $data = Procedures::where('name', 'like', '%'.$q.'%')->get();
+        return $response->getSuccessResponse('Success!', $data);
+    }
+
     public function store(Request $request)
     {
         $response = new Response();
