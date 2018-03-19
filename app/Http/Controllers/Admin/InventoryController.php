@@ -20,13 +20,25 @@ class InventoryController extends Controller
         foreach ($data as $inventory) {
             $drug = null;
             if ($inventory->item_type === 'drug') {
-                $drug = DrugCatalog::find($inventory->item_details_id);
+                $drug = InventoryDrugCatalog::find($inventory->item_details_id);
+                $inventory->name = $drug->name;
             }
             $inventory->drug = $drug;
         }
         return $response->getSuccessResponse('Success!', $data);
     }
-
+    public function getById($id)
+    {
+        $response = new Response();
+        $data = Inventory::find($id);
+        if (!$data) {
+            return $response->getNotFound();
+        }
+        $drug = InventoryDrugCatalog::find($data->item_details_id);
+        $data->name = $drug->name;
+        $data->drug = $drug;
+        return $response->getSuccessResponse('Success!', $data);
+    }
     public function store(Request $request)
     {
         $response = new Response();
@@ -35,7 +47,7 @@ class InventoryController extends Controller
             'name' => 'required | string',
             'code' => 'string | nullable',
             'manufacturer' => 'string | nullable',
-            'stockingUnit' => 'string | nullable',
+            'stockingUnit' => 'string | required',
             'reorderLevel' => 'integer | nullable',
             'price' => 'numeric | nullable',
             'itemType' => 'string | required',
@@ -75,7 +87,7 @@ class InventoryController extends Controller
         try {
             $item->save();
         } catch (QueryException $e) {
-            return $response->getUnknownError('Error Creating Inventory!');
+            return $response->getUnknownError($e);
         }
         return $response->getSuccessResponse('Created Inventory Successfully!', ['id' => $item->id]);
     }

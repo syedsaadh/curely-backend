@@ -85,4 +85,11 @@ Route::group(['prefix' => 'admin', 'middleware' => ['ability:admin']], function 
         Route::post('edit', 'Admin\VitalSignsController@edit');
         Route::get('delete/{id}', 'Admin\VitalSignsController@delete');
     });
+    Route::group(['prefix' => 'inventory'], function () {
+        Route::get('all', 'Admin\InventoryController@index');
+        Route::post('create', 'Admin\InventoryController@store');
+        Route::post('edit', 'Admin\InventoryController@edit');
+        Route::get('delete/{id}', 'Admin\InventoryController@delete');
+        Route::get('get/{id}', 'Admin\InventoryController@getById');
+    });
 });
