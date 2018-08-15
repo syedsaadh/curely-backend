@@ -22,7 +22,15 @@ class CreateInventoryTable extends Migration
             $table->integer('item_reorder_level')->nullable();
             $table->float('item_retail_price')->nullable();
             $table->string('item_type');
+            $table->dateTime('deleted_at')->nullable();
+            $table->integer('updated_by_user')->unsigned();
+            $table->integer('created_by_user')->unsigned();
             $table->timestamps();
+
+            $table->foreign('updated_by_user')->references('id')->on('users')
+                ->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('created_by_user')->references('id')->on('users')
+                ->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

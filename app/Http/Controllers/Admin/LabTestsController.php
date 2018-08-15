@@ -16,6 +16,13 @@ class LabTestsController extends Controller
         $data = LabTests::all();
         return $response->getSuccessResponse('Success!', $data);
     }
+
+    public function search($q)
+    {
+        $response = new Response();
+        $data = LabTests::where('name', 'like', '%'.$q.'%')->get();
+        return $response->getSuccessResponse('Success!', $data);
+    }
     public function store(Request $request)
     {
         $response = new Response();

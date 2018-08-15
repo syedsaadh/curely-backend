@@ -46,8 +46,11 @@ class AppointmentsController extends Controller
     public function getById($id)
     {
         $response = new Response();
+//        Nested Relationship
+//        $data = Appointments::with(['vitalSigns.fields', 'clinicalNotes',
+//            'labOrders', 'prescriptions.drugs.nested', 'prescriptions.drug', 'completedProcedures', 'treatmentPlans'])->find($id);
         $data = Appointments::with(['vitalSigns.fields', 'clinicalNotes',
-            'labOrders', 'prescriptions', 'completedProcedures', 'treatmentPlans'])->find($id);
+            'labOrders', 'prescriptions.drug', 'completedProcedures', 'treatmentPlans'])->find($id);
         if (!$data) return $response->getNotFound();
         return $response->getSuccessResponse('Success!', $data);
     }
@@ -185,6 +188,7 @@ class AppointmentsController extends Controller
         $searchAppointment = Appointments::where([
             ['scheduled_from', '<', $scheduledTo],
             ['scheduled_from', '>', $scheduledFrom],
+
         ])
             ->orWhere([
                 ['scheduled_from', '<=', $scheduledFrom],
@@ -199,7 +203,7 @@ class AppointmentsController extends Controller
                 ['scheduled_to', '>', $scheduledFrom],
             ])
             ->first();
-        if ($searchAppointment && $searchAppointment->id != $appointment->id) {
+        if ($searchAppointment && $searchAppointment->id != $appointment->id && $searchAppointment->cancelled != 1) {
             return $response->getAlreadyPresent('Schedule is Already Taken!');
         }
 

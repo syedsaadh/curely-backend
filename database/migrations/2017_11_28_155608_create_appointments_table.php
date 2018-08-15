@@ -33,15 +33,25 @@ class CreateAppointmentsTable extends Migration
             $table->increments('id');
             $table->integer('appointment_id')->unsigned();
             $table->integer('drug_id')->unsigned();
-            $table->string('drug_name');
-            $table->string('dosage');
-            $table->string('frequency');
             $table->string('intake');
-            $table->string('duration');
-            $table->string('duration_type');
+            $table->string('frequency');
+            $table->string('display_frequency')->nullable();
+            $table->string('food_precedence');
+            $table->integer('duration');
+            $table->string('duration_unit');
+            $table->integer('morning_units')->nullable();
+            $table->integer('afternoon_units')->nullable();
+            $table->integer('night_units')->nullable();
             $table->text('instruction')->nullable();
+            $table->integer('created_by_user_id')->unsigned();
+            $table->integer('updated_by_user_id')->unsigned();
+            $table->dateTime('deleted_at')->nullable();
             $table->timestamps();
 
+            $table->foreign('updated_by_user_id')->references('id')->on('users')
+                ->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('created_by_user_id')->references('id')->on('users')
+                ->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('appointment_id')->references('id')->on('appointments')
                 ->onUpdate('cascade')->onDelete('cascade');
         });

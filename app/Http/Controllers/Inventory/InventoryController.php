@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Inventory;
 
 use App\Models\DrugCatalog;
 use App\Models\Inventory;
@@ -69,6 +69,8 @@ class InventoryController extends Controller
             $drug->default_dosage = $request->input('strength');
             $drug->default_dosage_unit = $request->input('strengthUnit');
             $drug->instruction = $request->input('instruction');
+            $drug->created_by_user = $request->user()->id;
+            $drug->updated_by_user = $request->user()->id;
             try {
                 $drug->save();
                 $drugId = $drug->id;
@@ -84,6 +86,8 @@ class InventoryController extends Controller
         $item->item_reorder_level = $request->input('reorderLevel');
         $item->item_retail_price = $request->input('price');
         $item->item_type = $request->input('itemType');
+        $item->created_by_user = $request->user()->id;
+        $item->updated_by_user = $request->user()->id;
         try {
             $item->save();
         } catch (QueryException $e) {
@@ -156,6 +160,7 @@ class InventoryController extends Controller
         $inventory->item_reorder_level = $request->input('reorderLevel');
         $inventory->item_retail_price = $request->input('price');
         $inventory->item_type = $request->input('itemType');
+        $inventory->updated_by_user = $request->user()->id;
         try {
             $inventory->save();
         } catch (QueryException $e) {

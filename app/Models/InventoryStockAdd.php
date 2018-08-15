@@ -5,13 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class DrugCatalog extends Model
+class InventoryStockAdd extends Model
 {
     use SoftDeletes;
     protected $fillable = [
-        'name', 'drug_type', 'default_dosage', 'default_dosage_unit', 'instruction'
+        'inventory_id', 'quantity', 'batch_number', 'expiry', 'unit_cost', 'deleted_at', 'item_type'
     ];
     protected $dates = ['deleted_at'];
-
-    protected $table = 'drug_catalog';
+    protected $table = 'inventory_stock_add';
 }

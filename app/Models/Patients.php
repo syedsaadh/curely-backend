@@ -14,8 +14,12 @@ class Patients extends Model
         'city'
     ];
     public function appointments() {
-        return $this->hasMany('App\Models\Appointments', 'patient_id', 'id')->with(['vitalSigns.fields','clinicalNotes',
-            'labOrders','prescriptions', 'completedProcedures', 'treatmentPlans']);
+        return $this->hasMany('App\Models\Appointments', 'patient_id', 'id')->with(['patient', 'vitalSigns.fields','clinicalNotes',
+            'labOrders','prescriptions.drug', 'completedProcedures', 'treatmentPlans']);
+    }
+    public function admissions() {
+        return $this->hasMany('App\Models\IPDAdmission', 'patient_id', 'id')->with(['department', 'visits.vitalSigns.fields', 'visits.clinicalNotes',
+            'visits.labOrders', 'visits.prescriptions.drug', 'visits.completedProcedures', 'visits.treatmentPlans']);
     }
     public function medicalHistory() {
         return $this->hasMany('App\Models\PatientsMedicalHistory', 'patient_id');

@@ -27,7 +27,7 @@ class PatientsController extends Controller
     }
     public function getPatientById($id) {
         $response = new Response();
-        $data = Patients::with(['medicalHistory', 'appointments'])->find($id);
+        $data = Patients::with(['medicalHistory', 'appointments', 'admissions'])->find($id);
         if(!$data) {
             return $response->getNotFound();
         }

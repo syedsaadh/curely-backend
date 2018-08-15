@@ -49,6 +49,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['ability:admin']], function 
     Route::group(['prefix' => 'labtests'], function () {
         Route::get('all', 'Admin\LabTestsController@index');
         Route::post('create', 'Admin\LabTestsController@store');
+        Route::get('search/{q}', 'Admin\LabTestsController@search');
         Route::post('edit', 'Admin\LabTestsController@edit');
         Route::get('delete/{id}', 'Admin\LabTestsController@delete');
     });
@@ -58,6 +59,13 @@ Route::group(['prefix' => 'admin', 'middleware' => ['ability:admin']], function 
         Route::post('create', 'Admin\ProceduresController@store');
         Route::post('edit', 'Admin\ProceduresController@edit');
         Route::get('delete/{id}', 'Admin\ProceduresController@delete');
+    });
+    Route::group(['prefix' => 'drugs'], function () {
+        Route::get('all', 'Admin\DrugCatalogController@index');
+        Route::get('search/{q}', 'Admin\DrugCatalogController@search');
+        Route::post('create', 'Admin\DrugCatalogController@store');
+        Route::post('edit', 'Admin\DrugCatalogController@edit');
+        Route::get('delete/{id}', 'Admin\DrugCatalogController@delete');
     });
     Route::group(['prefix' => 'roles'], function () {
         Route::get('all', 'Admin\RolesController@index');
@@ -78,6 +86,40 @@ Route::group(['prefix' => 'admin', 'middleware' => ['ability:admin']], function 
         Route::get('completedprocedures/delete/{appointmentId}', 'Admin\AppointmentsCompletedProceduresController@delete');
         Route::post('treatmentplans/update', 'Admin\AppointmentsTreatmentPlansController@store');
         Route::get('treatmentplans/delete/{appointmentId}', 'Admin\AppointmentsTreatmentPlansController@delete');
+        Route::post('laborders/update', 'Admin\AppointmentsLabOrdersController@store');
+        Route::get('laborders/delete/{appointmentId}', 'Admin\AppointmentsLabOrdersController@delete');
+        Route::post('prescriptions/update', 'Admin\AppointmentsPrescriptionController@store');
+        Route::get('prescriptions/delete/{appointmentId}', 'Admin\AppointmentsPrescriptionController@delete');
+    });
+    Route::group(['prefix' => 'ipd'], function () {
+        Route::get('all', 'Ipd\IpdAdmissionController@index');
+        Route::get('get', 'Ipd\IpdAdmissionController@get');
+        Route::get('get/{id}', 'Ipd\IpdAdmissionController@getById');
+        Route::get('getAdmissionsVisits/{id}', 'Ipd\IpdController@getAllAdmissionVisitsByPatientId');
+        Route::get('getAvailableBeds/{deptId}', 'Ipd\IpdAdmissionController@getAvailableBeds');
+        Route::post('create', 'Ipd\IpdAdmissionController@store');
+        Route::post('edit', 'Ipd\IpdAdmissionController@edit');
+        Route::post('delete', 'Ipd\IpdAdmissionController@deleteAdmission');
+        Route::post('discharge', 'Ipd\IpdAdmissionController@dischargeAdmission');
+        Route::post('vitalsigns/update', 'Ipd\IpdVitalSignsController@store');
+        Route::get('vitalsigns/delete/{id}', 'Ipd\IpdVitalSignsController@delete');
+        Route::post('clinicalnotes/update', 'Ipd\IpdClinicalNotesController@store');
+        Route::get('clinicalnotes/delete/{id}', 'Ipd\IpdClinicalNotesController@delete');
+        Route::post('completedprocedures/update', 'Ipd\IpdCompletedProceduresController@store');
+        Route::get('completedprocedures/delete/{id}', 'Ipd\IpdCompletedProceduresController@delete');
+        Route::post('treatmentplans/update', 'Ipd\IpdTreatmentPlansController@store');
+        Route::get('treatmentplans/delete/{id}', 'Ipd\IpdTreatmentPlansController@delete');
+        Route::post('laborders/update', 'Ipd\IpdLabOrdersController@store');
+        Route::get('laborders/delete/{id}', 'Ipd\IpdLabOrdersController@delete');
+        Route::post('prescriptions/update', 'Ipd\IpdPrescriptionController@store');
+        Route::get('prescriptions/delete/{id}', 'Ipd\IpdPrescriptionController@delete');
+
+        Route::get('admitted/{department}', 'Ipd\IpdAdmissionController@getAdmittedPatientsByDept');
+        Route::get('visit/get/{id}', 'Ipd\IpdVisitController@get');
+        Route::post('visit/add', 'Ipd\IpdVisitController@addVisit');
+        Route::post('visit/edit', 'Ipd\IpdVisitController@edit');
+        Route::get('visit/delete/{id}', 'Ipd\IpdVisitController@delete');
+
     });
     Route::group(['prefix' => 'vitalsigns'], function () {
         Route::get('all', 'Admin\VitalSignsController@index');
@@ -86,10 +128,13 @@ Route::group(['prefix' => 'admin', 'middleware' => ['ability:admin']], function 
         Route::get('delete/{id}', 'Admin\VitalSignsController@delete');
     });
     Route::group(['prefix' => 'inventory'], function () {
-        Route::get('all', 'Admin\InventoryController@index');
-        Route::post('create', 'Admin\InventoryController@store');
-        Route::post('edit', 'Admin\InventoryController@edit');
-        Route::get('delete/{id}', 'Admin\InventoryController@delete');
-        Route::get('get/{id}', 'Admin\InventoryController@getById');
+        Route::get('all', 'Inventory\InventoryController@index');
+        Route::post('create', 'Inventory\InventoryController@store');
+        Route::post('edit', 'Inventory\InventoryController@edit');
+        Route::get('delete/{id}', 'Inventory\InventoryController@delete');
+        Route::get('get/{id}', 'Inventory\InventoryController@getById');
+        Route::post('stock/add', 'Inventory\InventoryStockAddController@store');
+        Route::post('stock/consume', 'Inventory\InventoryStockConsumeController@store');
+
     });
 });

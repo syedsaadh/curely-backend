@@ -12,7 +12,7 @@ class Response
     const VALIDATION_ERROR = 3;
     const ALREADY_PRESENT = 4;
     const UNKNOWN_ERROR= 5;
-
+    const BAD_REQUEST = 6;
     function __construct()
     {
     }
@@ -122,6 +122,12 @@ class Response
     public function getUnknownError($err) {
         $this->setCode(self::UNKNOWN_ERROR);
         $this->setMessage('Unknown Error!');
+        $this->setError($err);
+        return $this->getJsonResponse();
+    }
+    public function getBadRequestError($err) {
+        $this->setCode(self::BAD_REQUEST);
+        $this->setMessage('Bad Request Error!');
         $this->setError($err);
         return $this->getJsonResponse();
     }

@@ -20,7 +20,15 @@ class CreateDrugCatalogTable extends Migration
             $table->string('default_dosage')->nullable();
             $table->string('default_dosage_unit')->nullable();
             $table->text('instruction')->nullable();
+            $table->dateTime('deleted_at')->nullable();
+            $table->integer('updated_by_user')->unsigned();
+            $table->integer('created_by_user')->unsigned();
             $table->timestamps();
+
+            $table->foreign('updated_by_user')->references('id')->on('users')
+                ->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('created_by_user')->references('id')->on('users')
+                ->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

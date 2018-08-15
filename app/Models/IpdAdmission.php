@@ -15,39 +15,12 @@ class IpdAdmission extends Model
     {
         return $this->hasOne('App\Models\Patients', 'id', 'patient_id');
     }
-
-    public function vitalSigns()
+    public function department()
     {
-        return $this->hasOne('App\Models\IpdVitalSigns', 'appointment_id');
+        return $this->hasOne('App\Models\Departments', 'id', 'in_department');
     }
-
-    public function clinicalNotes()
+    public function visits()
     {
-        return $this->hasOne('App\Models\IpdClinicalNotes', 'appointment_id');
-    }
-
-    public function prescriptions()
-    {
-        return $this->hasMany('App\Models\IpdPrescriptions', 'appointment_id');
-    }
-
-    public function labOrders()
-    {
-        return $this->hasMany('App\Models\IpdLabOrders', 'appointment_id');
-    }
-
-    public function treatmentPlans()
-    {
-        return $this->hasMany('App\Models\IpdTreatmentPlans', 'appointment_id');
-    }
-
-    public function completedProcedures()
-    {
-        return $this->hasMany('App\Models\IpdCompletedProcedures', 'appointment_id');
-    }
-
-    public function scopeWithRecords()
-    {
-        return $this->with(['vitalSigns', 'clinicalNotes', 'prescriptions', 'labOrders', 'treatmentPlans', 'completedProcedures']);
+        return $this->hasMany('App\Models\IpdAdmissionVisit', 'ipd_admission_id');
     }
 }

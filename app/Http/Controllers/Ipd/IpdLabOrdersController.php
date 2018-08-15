@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Ipd;
 
 use App\Models\AppointmentLabOrders;
 use App\Models\Appointments;
+use App\Models\IpdAdmissionVisit;
+use App\Models\IpdLabOrders;
 use App\Models\LabTests;
 use App\Models\Response;
 use Illuminate\Database\QueryException;
@@ -11,13 +13,13 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
-class AppointmentsLabOrdersController extends Controller
+class IpdLabOrdersController extends Controller
 {
     public function store(Request $request)
     {
         $response = new Response();
         $validator = Validator::make($request->all(), [
-            'appointmentId' => 'required',
+            'visitId' => 'required',
             'lab_tests' => 'present|array',
             'lab_tests.*.lab_test_id' => 'required|numeric',
             'lab_tests.*.name' => 'required|string',
@@ -29,10 +31,10 @@ class AppointmentsLabOrdersController extends Controller
             return $response->getValidationError($validator->messages());
         }
         $labtests = $request->json('lab_tests');
-        $appointmentId = $request->input('appointmentId');
-        $appointment = Appointments::find($appointmentId);
-        if (!$appointment) {
-            return $response->getNotFound('Appointment Id Not Found');
+        $visitId = $request->input('visitId');
+        $visit = IpdAdmissionVisit::find($visitId);
+        if (!$visit) {
+            return $response->getNotFound('Visit Id Not Found');
         }
         $toDelete = array_filter($labtests, function ($el) {
             return $el['delete'] == true && array_key_exists('id', $el);
@@ -45,16 +47,18 @@ class AppointmentsLabOrdersController extends Controller
         });
         foreach ($toDelete as $item) {
             try {
-                AppointmentLabOrders::find($item['id'])->delete();
+                IpdLabOrders::find($item['id'])->delete();
             } catch (QueryException $e) {
             }
         }
         foreach ($toUpdate as $item) {
             try {
-                $it = AppointmentLabOrders::find($item['id']);
+                $it = IpdLabOrders::find($item['id']);
                 if ($it) {
                     $it->lab_test_name = $item['name'];
                     $it->instruction = $item['instruction'];
+                    $it->updated_by_user = $request->user()->id;
+
                     $it->save();
                 }
             } catch (QueryException $e) {
@@ -62,23 +66,27 @@ class AppointmentsLabOrdersController extends Controller
         }
         foreach ($toInsert as $item) {
             try {
-                $it = new AppointmentLabOrders();
+                $it = new IpdLabOrders();
+
                 $test = LabTests::find($item['lab_test_id']);
                 if ($test) {
-                    $it->appointment_id = $appointmentId;
+                    $it->ipd_admission_visit_id = $visitId;
                     $it->lab_test_id = $test->id;
                     $it->lab_test_name = $test->name;
                     $it->instruction = $item['instruction'];
+                    $it->updated_by_user = $request->user()->id;
+
                     $it->save();
                 }
             } catch (QueryException $e) {
+                dd($e);
             }
         }
         return $response->getSuccessResponse('Success!');
     }
-    public function delete($appointmentId) {
+    public function delete($visitId) {
         $response = new Response();
-        $tp = AppointmentLabOrders::where('appointment_id', '=', $appointmentId);
+        $tp = IpdLabOrders::where('ipd_admission_visit_id', '=', $visitId);
         if (!$tp) {
             return $response->getNotFound('Not Found');
         }

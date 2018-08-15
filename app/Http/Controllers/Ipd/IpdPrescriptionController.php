@@ -1,23 +1,25 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Ipd;
 
 use App\Models\AppointmentPrescriptions;
 use App\Models\Appointments;
 use App\Models\DrugCatalog;
+use App\Models\IpdAdmissionVisit;
+use App\Models\IpdPrescriptions;
 use App\Models\Response;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
-class AppointmentsPrescriptionController extends Controller
+class IpdPrescriptionController extends Controller
 {
     public function store(Request $request)
     {
         $response = new Response();
         $validator = Validator::make($request->all(), [
-            'appointmentId' => 'required',
+            'visitId' => 'required',
             'prescriptions' => 'present|array',
             'prescriptions.*.id' => 'numeric|nullable',
             'prescriptions.*.drug_id' => 'required|numeric',
@@ -34,10 +36,10 @@ class AppointmentsPrescriptionController extends Controller
             return $response->getValidationError($validator->messages());
         }
         $prescriptions = $request->json('prescriptions');
-        $appointmentId = $request->input('appointmentId');
-        $appointment = Appointments::find($appointmentId);
-        if (!$appointment) {
-            return $response->getNotFound('Appointment Id Not Found');
+        $visitId = $request->input('visitId');
+        $visit = IpdAdmissionVisit::find($visitId);
+        if (!$visit) {
+            return $response->getNotFound('Visit Id Not Found');
         }
         $toDelete = array_filter($prescriptions, function ($el) {
             return $el['delete'] == true && array_key_exists('id', $el);
@@ -50,7 +52,7 @@ class AppointmentsPrescriptionController extends Controller
         });
         foreach ($toDelete as $item) {
             try {
-                $it = AppointmentPrescriptions::find($item['id']);
+                $it = IpdPrescriptions::find($item['id']);
                 if($it) {
                     $it->delete();
                 }
@@ -59,7 +61,7 @@ class AppointmentsPrescriptionController extends Controller
         }
         foreach ($toUpdate as $item) {
             try {
-                $it = AppointmentPrescriptions::find($item['id']);
+                $it = IpdPrescriptions::find($item['id']);
                 if ($it) {
                     $it->intake = $item['intake'];
                     $it->frequency = $item['frequency'];
@@ -76,10 +78,10 @@ class AppointmentsPrescriptionController extends Controller
         }
         foreach ($toInsert as $item) {
             try {
-                $it = new AppointmentPrescriptions();
+                $it = new IpdPrescriptions();
                 $drug = DrugCatalog::find($item['drug_id']);
                 if ($drug) {
-                    $it->appointment_id = $appointmentId;
+                    $it->ipd_admission_visit_id = $visitId;
                     $it->drug_id = $drug->id;
                     $it->intake = $item['intake'];
                     $it->frequency = $item['frequency'];
@@ -98,9 +100,9 @@ class AppointmentsPrescriptionController extends Controller
         }
         return $response->getSuccessResponse('Success!');
     }
-    public function delete($appointmentId) {
+    public function delete($visitId) {
         $response = new Response();
-        $tp = AppointmentPrescriptions::where('appointment_id', '=', $appointmentId);
+        $tp = IpdPrescriptions::where('ipd_admission_visit_id', '=', $visitId);
         if (!$tp) {
             return $response->getNotFound('Not Found');
         }

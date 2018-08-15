@@ -31,30 +31,52 @@ class CreateIpdRelatedTables extends Migration
             $table->foreign('patient_id')->references('id')->on('patients')
                 ->onUpdate('cascade')->onDelete('cascade');
         });
-
-        Schema::create('ipd_prescriptions', function (Blueprint $table) {
+        Schema::create('ipd_admission_visit', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('ipd_admission_id')->unsigned();
-            $table->integer('drug_id')->unsigned();
-            $table->string('drug_name');
-            $table->string('dosage');
-            $table->string('frequency');
-            $table->string('intake');
-            $table->string('duration');
-            $table->string('duration_type');
-            $table->text('instruction')->nullable();
+            $table->string('visit_type');
+            $table->string('visited_by')->nullable();
+            $table->dateTime('visited_on')->nullable();
+            $table->integer('created_by_user_id')->unsigned();
             $table->integer('updated_by_user')->unsigned();
+            $table->dateTime('deleted_at')->nullable();
             $table->timestamps();
 
             $table->foreign('updated_by_user')->references('id')->on('users')
                 ->onUpdate('cascade')->onDelete('cascade');
-            $table->foreign('ipd_admission_id')->references('id')->on('ipd_admission')
+            $table->foreign('created_by_user_id')->references('id')->on('users')
+                ->onUpdate('cascade')->onDelete('cascade');
+        });
+        Schema::create('ipd_prescriptions', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('ipd_admission_visit_id')->unsigned();
+            $table->integer('drug_id')->unsigned();
+            $table->string('intake');
+            $table->string('frequency');
+            $table->string('display_frequency')->nullable();
+            $table->string('food_precedence');
+            $table->integer('duration');
+            $table->string('duration_unit');
+            $table->integer('morning_units')->nullable();
+            $table->integer('afternoon_units')->nullable();
+            $table->integer('night_units')->nullable();
+            $table->text('instruction')->nullable();
+            $table->integer('created_by_user_id')->unsigned();
+            $table->integer('updated_by_user_id')->unsigned();
+            $table->dateTime('deleted_at')->nullable();
+            $table->timestamps();
+
+            $table->foreign('created_by_user_id')->references('id')->on('users')
+                ->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('updated_by_user_id')->references('id')->on('users')
+                ->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('ipd_admission_visit_id')->references('id')->on('ipd_admission_visit')
                 ->onUpdate('cascade')->onDelete('cascade');
         });
 
         Schema::create('ipd_lab_orders', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('ipd_admission_id')->unsigned();
+            $table->integer('ipd_admission_visit_id')->unsigned();
             $table->integer('lab_test_id')->unsigned();
             $table->string('lab_test_name');
             $table->text('instruction')->nullable();
@@ -64,13 +86,13 @@ class CreateIpdRelatedTables extends Migration
             $table->foreign('updated_by_user')->references('id')->on('users')
                 ->onUpdate('cascade')->onDelete('cascade');
 
-            $table->foreign('ipd_admission_id')->references('id')->on('ipd_admission')
+            $table->foreign('ipd_admission_visit_id')->references('id')->on('ipd_admission_visit')
                 ->onUpdate('cascade')->onDelete('cascade');
         });
 
         Schema::create('ipd_clinical_notes', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('ipd_admission_id')->unsigned();
+            $table->integer('ipd_admission_visit_id')->unsigned();
             $table->text('complaints')->nullable();
             $table->text('notes')->nullable();
             $table->text('observations')->nullable();
@@ -81,12 +103,12 @@ class CreateIpdRelatedTables extends Migration
             $table->foreign('updated_by_user')->references('id')->on('users')
                 ->onUpdate('cascade')->onDelete('cascade');
 
-            $table->foreign('ipd_admission_id')->references('id')->on('ipd_admission')
+            $table->foreign('ipd_admission_visit_id')->references('id')->on('ipd_admission_visit')
                 ->onUpdate('cascade')->onDelete('cascade');
         });
         Schema::create('ipd_treatment_plans', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('ipd_admission_id')->unsigned();
+            $table->integer('ipd_admission_visit_id')->unsigned();
             $table->integer('procedure_id')->unsigned();
             $table->string('procedure_name');
             $table->integer('procedure_units')->unsigned();
@@ -99,12 +121,12 @@ class CreateIpdRelatedTables extends Migration
             $table->foreign('updated_by_user')->references('id')->on('users')
                 ->onUpdate('cascade')->onDelete('cascade');
 
-            $table->foreign('ipd_admission_id')->references('id')->on('ipd_admission')
+            $table->foreign('ipd_admission_visit_id')->references('id')->on('ipd_admission_visit')
                 ->onUpdate('cascade')->onDelete('cascade');
         });
         Schema::create('ipd_completed_procedures', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('ipd_admission_id')->unsigned();
+            $table->integer('ipd_admission_visit_id')->unsigned();
             $table->integer('procedure_id')->unsigned();
             $table->string('procedure_name');
             $table->integer('procedure_units')->unsigned();
@@ -117,19 +139,19 @@ class CreateIpdRelatedTables extends Migration
             $table->foreign('updated_by_user')->references('id')->on('users')
                 ->onUpdate('cascade')->onDelete('cascade');
 
-            $table->foreign('ipd_admission_id')->references('id')->on('ipd_admission')
+            $table->foreign('ipd_admission_visit_id')->references('id')->on('ipd_admission_visit')
                 ->onUpdate('cascade')->onDelete('cascade');
         });
         Schema::create('ipd_vital_signs', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('ipd_admission_id')->unsigned();
+            $table->integer('ipd_admission_visit_id')->unsigned();
             $table->integer('updated_by_user')->unsigned();
             $table->timestamps();
 
             $table->foreign('updated_by_user')->references('id')->on('users')
                 ->onUpdate('cascade')->onDelete('cascade');
 
-            $table->foreign('ipd_admission_id')->references('id')->on('ipd_admission')
+            $table->foreign('ipd_admission_visit_id')->references('id')->on('ipd_admission_visit')
                 ->onUpdate('cascade')->onDelete('cascade');
         });
         Schema::create('ipd_vital_signs_value', function (Blueprint $table) {
@@ -157,6 +179,7 @@ class CreateIpdRelatedTables extends Migration
         Schema::dropIfExists('ipd_clinical_notes');
         Schema::dropIfExists('ipd_lab_orders');
         Schema::dropIfExists('ipd_prescriptions');
+        Schema::dropIfExists('ipd_admission_visit');
         Schema::dropIfExists('ipd_admission');
     }
 }
