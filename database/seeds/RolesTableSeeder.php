@@ -21,6 +21,11 @@ class RolesTableSeeder extends Seeder
                 'name' => 'doctor',
                 'display_name' => 'Doctor',
                 'description' => 'Doctor manages appointments'
+            ],
+            [
+                'name' => 'nurse',
+                'display_name' => 'Nurse',
+                'description' => 'Nurse manages patients.'
             ]
         ];
         foreach ($roles as $key => $value) {

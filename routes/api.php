@@ -17,8 +17,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::post('authenticate', 'Auth\JWTLoginController@authenticate');
+
+
 Route::group(['prefix' => 'users'], function () {
     Route::post('login', 'Auth\JWTLoginController@authenticate');
+    Route::get('profile', 'Admin\UsersController@getProfile');
 });
 Route::group(['prefix' => 'admin', 'middleware' => ['ability:admin']], function () {
     Route::group(['prefix' => 'patients'], function () {

@@ -150,4 +150,9 @@ class UsersController extends Controller
         $user->roles()->attach($role->id);
         return $response->getSuccessResponse('Assigned Role Successfully!');
     }
+    public function getProfile(Request $request) {
+        $response = new Response();
+        dd($request);
+        return $response->getSuccessResponse('Success!');
+    }
 }

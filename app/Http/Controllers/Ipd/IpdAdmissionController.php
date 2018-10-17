@@ -265,10 +265,10 @@ class IpdAdmissionController extends Controller
         $dischargedOn = new Carbon($request->input('dischargedOn'));
         if($admittedOn->diffInMinutes($dischargedOn) < 15)
         {
-            return $response->getBadRequestError('Minimum of 15 Admit Time is Required!');
+            return $response->getBadRequestError('Minimum of 15 minutes Admit Time is Required!');
         }
         try {
-            $admission->discharged_on =
+            $admission->discharged_on = $dischargedOn;
             $admission->save();
         } catch (QueryException $e) {
             return $response->getUnknownError('Error Discharging Admission!');
